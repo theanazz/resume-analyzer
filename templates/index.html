@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Resume Analyzer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#0F1025;
+    --lav:#D6B9FC;
+    --blue:#838CE5;
+    --purple:#50207A;
+    --card:rgba(255,255,255,.06);
+    --text:#EDEDF7;
+}
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:radial-gradient(circle at top,#1b1d46,var(--bg));
+    color:var(--text);
+}
+
+.container{
+    width:92%;
+    max-width:1200px;
+    margin:40px auto;
+}
+
+.hero{
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    gap:40px;
+    margin-bottom:50px;
+}
+
+.hero h1{
+    font-size:46px;
+    line-height:1.1;
+}
+
+.hero span{color:var(--lav)}
+.hero p{opacity:.8}
+
+.card{
+    background:var(--card);
+    backdrop-filter:blur(16px);
+    border-radius:18px;
+    padding:28px;
+    margin-bottom:30px;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+    transition:.35s ease;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 30px 80px rgba(214,185,252,.18);
+}
+
+input,textarea{
+    width:100%;
+    margin:10px 0 18px;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    background:rgba(255,255,255,.08);
+    color:white;
+    font-family:inherit;
+}
+
+input[type="file"]{
+    display:none;
+}
+
+.file-label{
+    width:100%;
+    padding:16px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+    font-size:16px;
+    color:#0F1025;
+    background:linear-gradient(135deg,var(--lav),var(--blue));
+    text-align:center;
+    display:block;
+    margin:10px 0 18px;
+    transition:.35s ease;
+}
+
+.file-label:hover{
+    transform:scale(1.02);
+    box-shadow:0 10px 30px rgba(214,185,252,.25);
+}
+
+.file-name{
+    font-size:14px;
+    color:var(--lav);
+    margin-top:-10px;
+    margin-bottom:10px;
+}
+
+textarea{resize:none}
+
+button{
+    width:100%;
+    padding:16px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+    font-size:16px;
+    color:#0F1025;
+    background:linear-gradient(135deg,var(--lav),var(--blue));
+    transition:.35s ease;
+}
+
+button:hover{
+    transform:scale(1.02);
+    box-shadow:0 10px 30px rgba(214,185,252,.25);
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:25px;
+    margin-top:40px;
+}
+
+.stat{
+    text-align:center;
+}
+
+.circle{
+    width:160px;
+    height:160px;
+    margin:auto;
+}
+
+.circle svg{
+    transform:rotate(-90deg);
+}
+
+circle{
+    fill:none;
+    stroke-width:14;
+}
+
+.bg{
+    stroke:rgba(255,255,255,.1);
+}
+
+.progress{
+    stroke-linecap:round;
+    stroke-dasharray:440;
+    stroke-dashoffset:calc(440 - (440 * var(--val)) / 100);
+    transition:1.2s ease;
+}
+
+.ats{stroke:var(--lav)}
+.match{stroke:var(--blue)}
+
+.circle span{
+    position:relative;
+    top:-115px;
+    font-size:32px;
+    font-weight:700;
+}
+
+.skill{
+    display:inline-block;
+    padding:10px 18px;
+    margin:8px;
+    border-radius:30px;
+    background:rgba(255,255,255,.08);
+}
+
+.skill:hover{
+    background:linear-gradient(135deg,var(--purple),var(--blue));
+}
+
+ul{
+    list-style:none;
+    padding:0;
+}
+
+ul li{
+    padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+@media(max-width:900px){
+    .hero{grid-template-columns:1fr}
+    .dashboard{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="hero">
+    <div>
+        <h1>AI-powered<br><span>resume intelligence platform</span></h1>
+        <p>
+            ATS scoring, job matching, skill insights and
+            improvement suggestions in one dashboard.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Upload Resume</h2>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <label for="resume" class="file-label" id="fileLabel">Choose Resume (PDF)</label>
+            <input type="file" id="resume" name="resume" required accept=".pdf">
+            <div class="file-name" id="fileName"></div>
+            <textarea name="job_desc" id="jobDesc" rows="5" placeholder="Paste job description (optional)"></textarea>
+            <button type="submit">Analyze Resume</button>
+        </form>
+    </div>
+</div>
+
+{% if data.resume_text %}
+
+<div class="dashboard">
+
+    <div class="card stat">
+        <h3>ATS Score</h3>
+        <div class="circle" style="--val:{{ data.ats_score }}">
+            <svg width="160" height="160">
+                <circle class="bg" cx="80" cy="80" r="70"/>
+                <circle class="progress ats" cx="80" cy="80" r="70"/>
+            </svg>
+            <span>{{ data.ats_score }}%</span>
+        </div>
+    </div>
+
+    {% if data.job_match %}
+    <div class="card stat">
+        <h3>Job Match</h3>
+        <div class="circle" style="--val:{{ data.job_match }}">
+            <svg width="160" height="160">
+                <circle class="bg" cx="80" cy="80" r="70"/>
+                <circle class="progress match" cx="80" cy="80" r="70"/>
+            </svg>
+            <span>{{ data.job_match }}%</span>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<div class="card">
+    <h2>Detected Skills</h2>
+    {% if data.skills %}
+        {% for skill in data.skills %}
+            <span class="skill">{{ skill }}</span>
+        {% endfor %}
+    {% else %}
+        <p>No skills detected</p>
+    {% endif %}
+</div>
+
+{% if data.missing_skills %}
+<div class="card">
+    <h2>Missing Skills</h2>
+    {% for skill in data.missing_skills %}
+        <span class="skill">{{ skill }}</span>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>AI Suggestions</h2>
+    <ul>
+        {% for tip in data.feedback %}
+            <li>{{ tip }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="card">
+    <form method="POST" action="/download-report">
+        <input type="hidden" name="ats_score" value="{{ data.ats_score }}">
+        {% if data.job_match %}
+        <input type="hidden" name="job_match" value="{{ data.job_match }}">
+        {% endif %}
+        {% for skill in data.skills %}
+        <input type="hidden" name="skills" value="{{ skill }}">
+        {% endfor %}
+        {% for skill in data.missing_skills %}
+        <input type="hidden" name="missing_skills" value="{{ skill }}">
+        {% endfor %}
+        {% for feedback in data.feedback %}
+        <input type="hidden" name="feedback" value="{{ feedback }}">
+        {% endfor %}
+        <button type="submit">📄 Download Analysis Report (PDF)</button>
+    </form>
+</div>
+
+{% endif %}
+
+</div>
+
+<script>
+// File name display
+document.getElementById('resume').addEventListener('change', function(e) {
+    const fileName = e.target.files[0]?.name || '';
+    const fileNameEl = document.getElementById('fileName');
+    if (fileName) {
+        fileNameEl.textContent = '📎 ' + fileName;
+        fileNameEl.style.display = 'block';
+    }
+});
+</script>
+
+</body>
+</html>
